@@ -63,12 +63,7 @@ class myPromise {
             //   result instanceof myPromise
             // );
             if (result instanceof myPromise) {
-              result.then(
-                (res) => {
-                  resolve(res);
-                },
-                (err) => reject(err)
-              );
+              result.then(resolve, reject);
             } else {
               //   console.log("立即值");
               resolve(result);
@@ -82,7 +77,7 @@ class myPromise {
           try {
             const result = rejectedHandler(this.reason);
             if (result instanceof myPromise) {
-              result.then((res) => resolve(res)).catch((err) => reject(err));
+              result.then(resolve, reject);
             }
             resolve(result);
           } catch (err) {
