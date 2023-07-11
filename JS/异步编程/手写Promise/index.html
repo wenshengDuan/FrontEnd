@@ -5,234 +5,347 @@
 -->
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>手写Promise</title>
-</head>
-<body>
+  </head>
+  <body>
     <h1>手写Promise</h1>
-   <script> 
-        // 测试promise 嵌套　then catch 都会先放都微任务队列中 等到调用栈执行完成之后 统一执行微任务
-        function testPromiseNest(){
-            console.log('test promise 嵌套 start')
-            const p2 = new Promise((resolve, reject) => {
-                resolve('p2 ')
-            })
-            setTimeout(() => {
-                console.log('setTimeOut')
-            });
-            p2.then(val => {
-                console.log('then', val)
-                // pending状态才会丢到队列中 
-                // 有状态的直接执行
-                p2.then(val => {
-                    console.log('嵌套p2 then', val)
-                })
-            }).then(val => {
-                console.log('p3 then', val)
-            })
-            console.log('test promise 嵌套 end')
-        }
+    <script src="./index.js"></script>
+    <script>
+      // 测试promise 嵌套　then catch 都会先放都微任务队列中 等到调用栈执行完成之后 统一执行微任务
+      function testPromiseNest() {
+        console.log("test promise 嵌套 start");
+        const p2 = new Promise((resolve, reject) => {
+          resolve("p2 ");
+        });
+        setTimeout(() => {
+          console.log("setTimeOut");
+        });
+        p2.then((val) => {
+          console.log("then", val);
+          // pending状态才会丢到队列中
+          // 有状态的直接执行
+          p2.then((val) => {
+            console.log("嵌套p2 then", val);
+          });
+        }).then((val) => {
+          console.log("p3 then", val);
+        });
+        console.log("test promise 嵌套 end");
+      }
 
-        // 测试promise 状态
-        function testPromiseState() {   
-            Promise.resolve().then(() => {
-                console.log(1)
-                throw new Errow('error1')
-            }).catch(err => {
-                console.log(2)
-            }).then(val => {
-                console.log(3)
-            })
-    
-            Promise.resolve().then(() => {
-                console.log(1)
-                throw new Errow('error1')
-            }).catch(err => {
-                console.log(2)
-            }).catch(val => {
-                console.log(3)
-            })
-            
-            //catch 正常返回reslove  只有throw 才是reject
-            const p1 = new Promise((resolve, reject) => {
-                throw new Error('p1 err')
-            })
+      // 测试promise 状态
+      function testPromiseState() {
+        Promise.resolve()
+          .then(() => {
+            console.log(1);
+            throw new Errow("error1");
+          })
+          .catch((err) => {
+            console.log(2);
+          })
+          .then((val) => {
+            console.log(3);
+          });
 
-            p1.then(err => {
-                console.log('p1 catch', err);
-                // return 'p1 catch return';
-                throw '2 err'
-            }).then(err => {
-               console.log('p1 catch2', err)
-            }).then((val) => {
-                console.log('p1 then', val)
-            }).catch(err => {
-                console.log('only catch', err.message)
-            }).catch(err => {
-                console.log('only catch2', err.message)
-            }).then(val => {
-                console.log('only then', val)
-            })
+        Promise.resolve()
+          .then(() => {
+            console.log(1);
+            throw new Errow("error1");
+          })
+          .catch((err) => {
+            console.log(2);
+          })
+          .catch((val) => {
+            console.log(3);
+          });
 
-        }
-        // 宏任务与微任务
-        function macroTaskAndmicroTask() {
-            console.log(100)
-            setTimeout(()=> {
-                console.log(200)
-            })
-    
-            Promise.resolve().then(() => {
-                console.log(300)
-            })
-    
-            console.log(400)
-        }
-
-        // 测试 异步async await promise 与settimeout
-        // 打印结果 
-        // script start
-        // async1 start
-        // async2
-        // promise1
-        // script end
-        // async1 end
-        // promise2
-        // setTimeout
-        function testAsyncPromiseSettimeout() {
-            async function async1() {
-                console.log('async１ start')
-                await async2()
-                console.log('async1 end')
-            }
-
-            async function async2() {
-                console.log('async2')
-            }
-
-            console.log('script start')
-            setTimeout(() => {
-                console.log('settimeout')
-            })
-
-            async1()
-
-            new Promise((resolve, reject) => {
-                console.log('promise1')
-                resolve()
-            }).then(() => {
-                console.log('promise2')
-            })
-
-            console.log('script end')
-        }
-        // testAsyncPromiseSettimeout()
-
-        function testPromiseThenCatch() {
-            console.log('test start')
-            Promise.resolve()
-                .then(() => {
-                    console.log('promise then')
-                })
-            Promise.reject()
-                .catch(() => {
-                    console.log('promise reject')
-                })
-            console.log('test end')
-        }
-        
-        // testPromiseThenCatch()
-        
-        // 测试 异步流中返回异步
-        function testThenReturnPromise() {
-            function delay(time) {
-                return new Promise((resolve, reject) => {
-                    setTimeout(resolve, time)
-                })
-            }
-            console.log('step1')
-            delay(100)
-                .then(() => {
-                    console.log('step 2 after 100ms')
-                    return delay(2000)
-                })
-                .then(() => {
-                    console.log('step 3 after 2000ms')
-                })
-                .then(() => {
-                    console.log('step 4 next job')
-                    return delay(1000)
-                })
-                .then(() => {
-                    console.log('step 5 after 1000ms')
-                })
-        }
-
-        function test() {
-        console.log('start－－－－－－２s')
+        //catch 正常返回reslove  只有throw 才是reject
         const p1 = new Promise((resolve, reject) => {
-            setTimeout(() => {
-                console.log('p1 timeout')
-                resolve('222')
-            }, 2000)
-        })
+          throw new Error("p1 err");
+        });
 
-        p1.then(val => {
-            console.log('val－－－－－－－－－－－－－－ 2s', val)
-            return new Promise((resolve,reject) => {
-                setTimeout(() => {
-                    console.log('p1 then timeout')
-                    resolve('step2 delay 2000ms')
-                }, 2000)
-            })
-        }).then(val => {
-            console.log('step2 then')
-            console.log(val)
+        p1.then((err) => {
+          console.log("p1 catch", err);
+          // return 'p1 catch return';
+          throw "2 err";
         })
+          .then((err) => {
+            console.log("p1 catch2", err);
+          })
+          .then((val) => {
+            console.log("p1 then", val);
+          })
+          .catch((err) => {
+            console.log("only catch", err.message);
+          })
+          .catch((err) => {
+            console.log("only catch2", err.message);
+          })
+          .then((val) => {
+            console.log("only then", val);
+          });
+      }
+      // 宏任务与微任务
+      function macroTaskAndmicroTask() {
+        console.log(100);
+        setTimeout(() => {
+          console.log(200);
+        });
 
-        console.log('end')
-    }
-        
-        // 测试 resolve 中返回reject
-        function testResolveReturnReject() {
-            // resolve 和 Promise.resolve 作用一样　都会将非promise 或者thenable 对象展开
-            // 不同的是 Promise.resovle 如果参数是promise 则原样返回 resolve 会生成新的promise
-            const p1 = new Promise((resolve, reject) => {
-                reject('err1')
-            })
-            
-            // const p1 = {
-            //     then: (resolve, reject) => {
-            //         reject('err')
-            //     }
-            // }
-            // const p2 = Promise.resolve(p1);
-            const p2 = new Promise((resolve, reject) => {
-                resolve(p1)
-            })
-            console.log('p2 === p1', p2 === p1)
-            console.log('p2', p2)
-            p2.then(val => {
-                console.log('p2 then', val)
-            })
-            .catch(err => {
-                console.log('p2 catch', err)
-            })
+        Promise.resolve().then(() => {
+          console.log(300);
+        });
+
+        console.log(400);
+      }
+
+      // 测试 异步async await promise 与settimeout
+      // 打印结果
+      // script start
+      // async1 start
+      // async2
+      // promise1
+      // script end
+      // async1 end
+      // promise2
+      // setTimeout
+      function testAsyncPromiseSettimeout() {
+        async function async1() {
+          console.log("async１ start");
+          await async2();
+          console.log("async1 end");
         }
 
+        async function async2() {
+          console.log("async2");
+        }
 
-        // testThenReturnPromise();
+        console.log("script start");
+        setTimeout(() => {
+          console.log("settimeout");
+        });
 
+        async1();
 
-        // 测试promise 功能
-        // 同步能力
-        // 异步能力
-        // 链式调用能力
-        // catch 穿透能力
-        // race all API 
-        // then catch 中返回promise
-   </script> 
-</body>
+        new Promise((resolve, reject) => {
+          console.log("promise1");
+          resolve();
+        }).then(() => {
+          console.log("promise2");
+        });
+
+        console.log("script end");
+      }
+      // testAsyncPromiseSettimeout()
+
+      function testPromiseThenCatch() {
+        console.log("test start");
+        Promise.resolve().then(() => {
+          console.log("promise then");
+        });
+        Promise.reject().catch(() => {
+          console.log("promise reject");
+        });
+        console.log("test end");
+      }
+
+      // testPromiseThenCatch()
+
+      // 测试 异步流中返回异步
+      function testThenReturnPromise() {
+        function delay(time) {
+          //   return new Promise((resolve, reject) => {
+          //     console.log("timeout", time);
+          //     setTimeout(resolve, time);
+          //   });
+          return new myPromise((resolve, reject) => {
+            console.log("timeout", time);
+            setTimeout(resolve, time);
+          });
+        }
+        console.log("step1");
+        delay(2000)
+          .then(() => {
+            console.log("step 2 after 100ms");
+            return delay(2000);
+          })
+          .then(() => {
+            console.log("step 3 after 2000ms");
+          })
+          .then(() => {
+            console.log("step 4 next job");
+            return delay(1000);
+          })
+          .then(() => {
+            console.log("step 5 after 1000ms");
+          })
+          .catch((err) => {
+            console.log("出错啦", err);
+          });
+      }
+
+      function test() {
+        console.log("start－－－－－－２s");
+        const p1 = new Promise((resolve, reject) => {
+          setTimeout(() => {
+            console.log("p1 timeout");
+            resolve("222");
+          }, 2000);
+        });
+
+        p1.then((val) => {
+          console.log("val－－－－－－－－－－－－－－ 2s", val);
+          return new Promise((resolve, reject) => {
+            setTimeout(() => {
+              console.log("p1 then timeout");
+              resolve("step2 delay 2000ms");
+            }, 2000);
+          });
+        }).then((val) => {
+          console.log("step2 then");
+          console.log(val);
+        });
+
+        console.log("end");
+      }
+
+      // 测试 resolve 中返回reject
+      function testResolveReturnReject() {
+        // resolve 和 Promise.resolve 作用一样　都会将非promise 或者thenable 对象展开
+        // 不同的是 Promise.resovle 如果参数是promise 则原样返回 resolve 会生成新的promise
+        const p1 = new Promise((resolve, reject) => {
+          reject("err1");
+        });
+
+        // const p1 = {
+        //     then: (resolve, reject) => {
+        //         reject('err')
+        //     }
+        // }
+        // const p2 = Promise.resolve(p1);
+        const p2 = new Promise((resolve, reject) => {
+          resolve(p1);
+        });
+        console.log("p2 === p1", p2 === p1);
+        console.log("p2", p2);
+        p2.then((val) => {
+          console.log("p2 then", val);
+        }).catch((err) => {
+          console.log("p2 catch", err);
+        });
+      }
+
+      // testThenReturnPromise();
+
+      // 测试promise 功能
+      // 同步能力
+      // 异步能力
+      // 链式调用能力
+      // catch 穿透能力
+      // race all API
+      // then catch 中返回promise
+    </script>
+    <!-- <script src="./index.js"></script> -->
+    <script>
+      function testsync() {
+        // console.log('start')
+        const p1 = new myPromise((resolve, reject) => {
+          resolve("1");
+        });
+
+        // 同步情况下 测试then 链式调用 同步测试通过
+        /**
+         * 1. then 链式调用可接值
+         * 2. then 函数参数无返回时 默认fulfilled状态 值为undefined
+         * 3. then 中thorw err catch 可接
+         * 4. catch 无返回默认fulfilled undefined
+         * */
+        p1.then((val) => {
+          console.log("p1 then", val);
+          return 2;
+        })
+          .then((val) => {
+            console.log("p2 then", val);
+          })
+          .then((val) => {
+            console.log("p3 then", val);
+            throw new Error("err");
+          })
+          .catch((err) => {
+            console.log("p4 catch", err);
+          })
+          .then((val) => {
+            console.log("p5 then", val);
+          });
+        // console.log('end')
+      }
+
+      /**
+       * 测试异步执行
+       */
+      function testAsync() {
+        console.log("test async start ---- 2s");
+        const p2 = new myPromise((resolve, reject) => {
+          setTimeout(() => {
+            resolve(1);
+          }, 2000);
+        });
+
+        //    p2.then(val => {
+        //        console.log('async p2-0', val)
+        //        return 2
+        //    })
+        //    .then(val => {
+        //         console.log('asyc p3', val)
+        //    })
+
+        p2.then((val) => {
+          console.log("async p2-1", val);
+        });
+
+        p2.then((val) => {
+          console.log("async p2-0", val);
+          return 2;
+        }).then((val) => {
+          console.log("asyc p3", val);
+        });
+
+        p2.then((val) => {
+          console.log("async p2-2", val);
+        });
+
+        console.log("test async end ----");
+      }
+
+      function testStaticMethods() {
+        const p1 = myPromise.resolve(1);
+        const p2 = new myPromise((resolve, reject) => {
+          setTimeout(() => {
+            reject(2);
+          }, 2000);
+        });
+
+        myPromise
+          .all([p1, p2])
+          .then((res) => {
+            console.log("promise all", res);
+          })
+          .catch((err) => {
+            console.log("promise all err", err);
+          });
+
+        myPromise
+          .race([p1, p2])
+          .then((res) => {
+            console.log("promise race", res);
+          })
+          .catch((err) => {
+            console.log("promise race err", err);
+          });
+      }
+    </script>
+  </body>
 </html>
