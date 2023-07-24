@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>页面渲染</title>
+</head>
+<body>
+    <script>
+        window.addEventListener('DOMContentLoaded', () => {
+            console.log('window domcontentloaded')
+        })
+        
+        window.addEventListener('load', () => {
+            console.log('window Load')
+        })
+   </script>
+    <p>第一段文字</p> 
+    <!-- <script type="module" src="./m.js"></script>
+    <script src="./index.js" type="module"></script> -->
+    <!-- <script src="./syncindex.js" async></script> -->
+    <script src="./syncindex.js" defer></script>
+    <p>第二段文字</p>
+   <!-- <script>
+        window.addEventListener('DOMContentLoaded', () => {
+            console.log('window domcontentloaded')
+        })
+        
+        window.addEventListener('load', () => {
+            console.log('window Load')
+        })
+   </script> -->
+</body>
+</html>
