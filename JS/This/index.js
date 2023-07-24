@@ -28,6 +28,7 @@ const lisi = {
     },
     wait() { 
         // settimeout 全局对象内置方法 = window.setTimeout
+        // 箭头函数this 为定义时的父级作用域
         setTimeout(() => { 
             console.log('settimeout-this-lisi', this)
         }, 1000)
